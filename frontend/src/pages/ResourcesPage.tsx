@@ -8,7 +8,6 @@ import { ResourceDialog } from '@/components/dialogs/ResourceDialog';
 import { getResources, createResource, updateResource, deleteResource, Resource } from '@/lib/api';
 import { toast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 
 export default function ResourcesPage() {
   const [resources, setResources] = useState<Resource[]>([]);
@@ -90,16 +89,27 @@ export default function ResourcesPage() {
 
   const columns: Column<Resource>[] = [
     { key: 'name', label: 'Name' },
-    { key: 'email', label: 'Email' },
     { key: 'role', label: 'Role' },
     { key: 'department', label: 'Department' },
+    { key: 'location', label: 'Location' },
     {
-      key: 'availability',
-      label: 'Availability',
+      key: 'capacity_hours',
+      label: 'Capacity',
       render: (item) => (
-        <div className="flex items-center gap-2 min-w-[120px]">
-          <Progress value={item.availability} className="h-2" />
-          <span className="text-sm text-muted-foreground">{item.availability}%</span>
+        <span>{item.capacity_hours}h/week</span>
+      ),
+    },
+    {
+      key: 'availability_hours',
+      label: 'Available',
+      render: (item) => (
+        <div className="flex items-center gap-2">
+          <span>{item.availability_hours}h/week</span>
+          {item.capacity_hours && (
+            <span className="text-xs text-muted-foreground">
+              ({Math.round((item.availability_hours / item.capacity_hours) * 100)}%)
+            </span>
+          )}
         </div>
       ),
     },
@@ -110,7 +120,7 @@ export default function ResourcesPage() {
         <div className="flex flex-wrap gap-1 max-w-[200px]">
           {item.skills?.slice(0, 3).map((skill, i) => (
             <Badge key={i} variant="secondary" className="text-xs">
-              {skill}
+              {skill.skill_name} ({skill.proficiency_level})
             </Badge>
           ))}
           {item.skills && item.skills.length > 3 && (

@@ -127,13 +127,24 @@ export const analyzeProjectDocumentation = async (projectId: string | number) =>
 };
 
 // Resources
+export interface ResourceSkill {
+  id?: number;
+  skill_name: string;
+  proficiency_level: number; // 1-5
+}
+
 export interface Resource {
-  id?: string;
-  project_id?: string | number;
+  id?: number;
+  project_id?: number;
   name: string;
   role: string;
   capacity_hours: number;
   availability_hours: number;
+  department?: string;
+  location?: string;
+  skills?: ResourceSkill[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const getResources = async () => {
@@ -146,12 +157,12 @@ export const createResource = async (resource: Resource) => {
   return response.data;
 };
 
-export const updateResource = async (id: string, resource: Partial<Resource>) => {
+export const updateResource = async (id: number, resource: Partial<Resource>) => {
   const response = await api.put(`/resources/${id}`, resource);
   return response.data;
 };
 
-export const deleteResource = async (id: string) => {
+export const deleteResource = async (id: number) => {
   const response = await api.delete(`/resources/${id}`);
   return response.data;
 };
