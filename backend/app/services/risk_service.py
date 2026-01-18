@@ -112,8 +112,10 @@ async def analyze_project_documentation(
         # Check if there's any data to analyze
         if not status_reports and not resources and not allocations:
             raise ValueError(
-            f"No data available to analyze for project '{project.name}'. "
-            "Please add status reports, team members, or resource allocations before using AI analysis."
+                f"No data available to analyze for project '{project.name}'. "
+                "Please add status reports, team members, or resource allocations before using AI analysis."
+            )
+        
         doc_parts = [
             f"PROJECT OVERVIEW:",
             f"Name: {project.name}",
