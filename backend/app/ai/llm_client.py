@@ -1,9 +1,9 @@
 import json
-from groq import Groq
+from groq import AsyncGroq
 from typing import Dict, Any, Optional
 from app.core.config import settings
 
-client = Groq(api_key=settings.groq_api_key)
+client = AsyncGroq(api_key=settings.groq_api_key)
 
 
 async def call_llm(prompt: str, system_prompt: Optional[str] = None, temperature: Optional[float] = None) -> Dict[str, Any]:
@@ -16,7 +16,7 @@ async def call_llm(prompt: str, system_prompt: Optional[str] = None, temperature
         messages.append({"role": "system", "content": system_prompt})
     messages.append({"role": "user", "content": prompt})
 
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model=settings.groq_model,
         messages=messages,
         temperature=temperature or settings.groq_temperature,
