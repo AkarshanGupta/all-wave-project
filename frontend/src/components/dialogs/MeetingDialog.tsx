@@ -81,7 +81,7 @@ export function MeetingDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {meeting ? 'Edit Meeting' : 'Schedule Meeting'}
@@ -89,7 +89,7 @@ export function MeetingDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 max-h-[calc(90vh-200px)] overflow-y-auto pr-2">
               <FormField
                 control={form.control}
                 name="project_id"
