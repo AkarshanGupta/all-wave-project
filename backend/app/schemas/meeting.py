@@ -1,6 +1,6 @@
-from pydantic import BaseModel, field_serializer, field_validator
+from pydantic import BaseModel, field_serializer, field_validator, model_serializer
 from datetime import datetime, date
-from typing import Optional, List
+from typing import Optional, List, Any
 import json
 
 
@@ -72,14 +72,26 @@ class MeetingResponse(BaseModel):
     class Config:
         from_attributes = True
     
-    @field_serializer('date')
-    def serialize_date(self, value: Optional[date], _info) -> Optional[str]:
-        """Serialize date to string format."""
-        if value:
-            if isinstance(value, date):
-                return value.strftime("%Y-%m-%d")
-            return str(value)
-        return None
+    @model_serializer
+    def serialize_model(self) -> dict[str, Any]:
+        """Custom serializer to handle date and attendees conversion."""
+        data = {
+            'id': self.id,
+            'project_id': self.project_id,
+            'title': self.title,
+            'raw_text': self.raw_text,
+            'summary': self.summary,
+            'decisions': self.decisions,
+            'open_questions': self.open_questions,
+            'date': self.date.strftime("%Y-%m-%d") if isinstance(self.date, date) else self.date,
+            'time': self.time,
+            'duration': self.duration,
+            'attendees': self.attendees if isinstance(self.attendees, list) else [],
+            'status': self.status,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+        return data
     
     @field_validator('attendees', mode='before')
     @classmethod
