@@ -56,7 +56,10 @@ export function RiskDialog({
 
   useEffect(() => {
     if (risk) {
-      form.reset(risk);
+      form.reset({
+        ...risk,
+        project_id: String(risk.project_id),
+      });
     } else {
       form.reset({
         project_id: '',

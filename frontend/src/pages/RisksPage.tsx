@@ -53,11 +53,19 @@ export default function RisksPage() {
 
   const handleSave = async (risk: Risk) => {
     try {
+      // Ensure project_id is a number
+      const riskData = {
+        ...risk,
+        project_id: Number(risk.project_id),
+        probability: Number(risk.probability),
+        impact: Number(risk.impact),
+      };
+
       if (selectedRisk?.id) {
-        await updateRisk(selectedRisk.id, risk);
+        await updateRisk(selectedRisk.id, riskData);
         toast({ title: 'Success', description: 'Risk updated successfully' });
       } else {
-        await createRisk(risk);
+        await createRisk(riskData);
         toast({ title: 'Success', description: 'Risk created successfully' });
       }
       setDialogOpen(false);
@@ -68,6 +76,7 @@ export default function RisksPage() {
         description: 'Failed to save risk',
         variant: 'destructive',
       });
+      console.error('Save error:', error);
     }
   };
 
