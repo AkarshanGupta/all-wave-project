@@ -5,6 +5,7 @@ from app.models.risk import Risk
 from app.schemas.risk import RiskAnalyze
 from app.ai.llm_client import call_llm
 from app.utils.file_utils import load_prompt
+from app.services.risk_analytics_service import calculate_risk_score, record_risk_metric
 
 
 def calculate_severity(probability: int, impact: int) -> str:
@@ -42,6 +43,7 @@ async def analyze_risks_from_text(
         probability = int(risk_data_item.get("probability", 3))
         impact = int(risk_data_item.get("impact", 3))
         severity = risk_data_item.get("severity") or calculate_severity(probability, impact)
+        risk_score = calculate_risk_score(probability, impact)
         
         risk = Risk(
             project_id=risk_data.project_id,
@@ -51,8 +53,11 @@ async def analyze_risks_from_text(
             probability=probability,
             impact=impact,
             severity=severity,
+            risk_score=risk_score,
+            trend="stable",
             mitigation_plan=risk_data_item.get("mitigation_plan"),
             status="open",
+            approval_status="pending",
         )
         
         db.add(risk)
@@ -62,6 +67,8 @@ async def analyze_risks_from_text(
     
     for risk in created_risks:
         await db.refresh(risk)
+        # Record initial metric
+        await record_risk_metric(db, risk.id, risk.probability, risk.impact, risk.severity)
     
     return created_risks
 
@@ -77,4 +84,3 @@ async def get_risks_by_project(
         .order_by(Risk.created_at.desc())
     )
     return list(result.scalars().all())
-

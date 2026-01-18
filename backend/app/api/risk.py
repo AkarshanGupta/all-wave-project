@@ -1,11 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from typing import List
+from typing import List, Dict
 from app.core.database import get_db
 from app.models.risk import Risk
-from app.schemas.risk import RiskAnalyze, RiskResponse, RiskCreate, RiskUpdate
+from app.schemas.risk import RiskAnalyze, RiskResponse, RiskCreate, RiskUpdate, RiskAnalyticsResponse, RiskMatrixDataResponse
 from app.services.risk_service import analyze_risks_from_text, get_risks_by_project
+from app.services.risk_analytics_service import (
+    get_risk_analytics, 
+    calculate_trend, 
+    detect_early_warnings,
+    calculate_risk_score,
+    record_risk_metric
+)
 
 router = APIRouter(prefix="/risks", tags=["risks"])
 
@@ -124,3 +131,92 @@ async def delete_risk(
     return None
 
 
+@router.get("/analytics/{project_id}", response_model=RiskAnalyticsResponse)
+async def get_analytics(
+    project_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get risk analytics for a project."""
+    try:
+        analytics = await get_risk_analytics(db, project_id)
+        return analytics
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/matrix/{project_id}", response_model=RiskMatrixDataResponse)
+async def get_risk_matrix(
+    project_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get risk matrix data (probability vs impact)."""
+    try:
+        risks = await get_risks_by_project(db, project_id)
+        risk_responses = [RiskResponse.from_orm(r) for r in risks]
+        return RiskMatrixDataResponse(
+            risks=risk_responses,
+            probability_range=(1, 10),
+            impact_range=(1, 10)
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/warnings/{project_id}", response_model=List[Dict])
+async def get_early_warnings(
+    project_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get early warning indicators for escalation."""
+    try:
+        warnings = await detect_early_warnings(db, project_id)
+        return warnings
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{risk_id}/approve")
+async def approve_risk(
+    risk_id: int,
+    approved_by: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Approve a risk and record the metric."""
+    result = await db.execute(select(Risk).where(Risk.id == risk_id))
+    risk = result.scalar_one_or_none()
+    
+    if not risk:
+        raise HTTPException(status_code=404, detail="Risk not found")
+    
+    risk.approval_status = "approved"
+    risk.approved_by = approved_by
+    db.add(risk)
+    await db.commit()
+    await db.refresh(risk)
+    
+    # Record metric snapshot
+    await record_risk_metric(db, risk_id, risk.probability, risk.impact, risk.severity)
+    
+    return {"status": "approved", "risk_id": risk_id}
+
+
+@router.post("/{risk_id}/reject")
+async def reject_risk(
+    risk_id: int,
+    approved_by: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Reject a risk."""
+    result = await db.execute(select(Risk).where(Risk.id == risk_id))
+    risk = result.scalar_one_or_none()
+    
+    if not risk:
+        raise HTTPException(status_code=404, detail="Risk not found")
+    
+    risk.approval_status = "rejected"
+    risk.approved_by = approved_by
+    db.add(risk)
+    await db.commit()
+    await db.refresh(risk)
+    
+    return {"status": "rejected", "risk_id": risk_id}

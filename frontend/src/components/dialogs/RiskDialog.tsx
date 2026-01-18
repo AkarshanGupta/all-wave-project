@@ -25,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Risk } from '@/lib/api';
+import { Risk, api } from '@/lib/api';
 
 interface RiskDialogProps {
   open: boolean;
@@ -296,7 +296,58 @@ export function RiskDialog({
             </DialogFooter>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
-  );
-}
+
+        {/* Approval Section - Show if editing an existing risk */}
+        {risk && (
+          <div className="mt-6 pt-6 border-t space-y-4">
+            <div className="text-sm font-semibold">Approval Workflow</div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <span className="text-xs text-muted-foreground">Status:</span>
+                <div className="text-sm font-medium capitalize">{risk.approval_status || 'pending'}</div>
+              </div>
+              {risk.approved_by && (
+                <div>
+                  <span className="text-xs text-muted-foreground">Approved By:</span>
+                  <div className="text-sm font-medium">{risk.approved_by}</div>
+                </div>
+              )}
+            </div>
+            {risk.approval_status === 'pending' && (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={async () => {
+                    try {
+                      await api.post(`/risks/${risk.id}/approve`, { approved_by: 'Admin' });
+                      onOpenChange(false);
+                      // Trigger refresh
+                      onSave(risk);
+                    } catch (error) {
+                      console.error('Approval failed:', error);
+                    }
+                  }}
+                >
+                  Approve
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      await api.post(`/risks/${risk.id}/reject`, { approved_by: 'Admin' });
+                      onOpenChange(false);
+                      // Trigger refresh
+                      onSave(risk);
+                    } catch (error) {
+                      console.error('Rejection failed:', error);
+                    }
+                  }}
+                >
+                  Reject
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
