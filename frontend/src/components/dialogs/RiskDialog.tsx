@@ -56,10 +56,33 @@ export function RiskDialog({
 
   useEffect(() => {
     if (risk) {
-      form.reset({
-        ...risk,
-        project_id: String(risk.project_id),
-      });
+      try {
+        form.reset({
+          id: risk.id,
+          project_id: String(risk.project_id || ''),
+          title: risk.title || '',
+          description: risk.description || '',
+          category: risk.category || 'technical',
+          probability: Number(risk.probability) || 5,
+          impact: Number(risk.impact) || 5,
+          severity: risk.severity || 'medium',
+          mitigation_plan: risk.mitigation_plan || '',
+          status: risk.status || 'open',
+        });
+      } catch (error) {
+        console.error('Error resetting form with risk data:', error);
+        form.reset({
+          project_id: '',
+          title: '',
+          description: '',
+          category: 'technical',
+          probability: 5,
+          impact: 5,
+          severity: 'medium',
+          mitigation_plan: '',
+          status: 'open',
+        });
+      }
     } else {
       form.reset({
         project_id: '',

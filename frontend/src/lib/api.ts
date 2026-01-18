@@ -82,7 +82,7 @@ export const deleteMeeting = async (id: string) => {
 
 // Risks
 export interface Risk {
-  id?: string;
+  id?: string | number;
   project_id: string | number;
   title: string;
   description: string;
@@ -92,6 +92,8 @@ export interface Risk {
   severity: string;
   mitigation_plan?: string;
   status?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const getRisks = async () => {
@@ -104,12 +106,12 @@ export const createRisk = async (risk: Risk) => {
   return response.data;
 };
 
-export const updateRisk = async (id: string, risk: Partial<Risk>) => {
+export const updateRisk = async (id: string | number, risk: Partial<Risk>) => {
   const response = await api.put(`/risks/${id}`, risk);
   return response.data;
 };
 
-export const deleteRisk = async (id: string) => {
+export const deleteRisk = async (id: string | number) => {
   const response = await api.delete(`/risks/${id}`);
   return response.data;
 };
