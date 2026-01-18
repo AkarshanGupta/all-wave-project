@@ -54,16 +54,6 @@ export function StatCard({
           ) : (
             <p className="text-3xl font-bold text-foreground">{value}</p>
           )}
-          {trend && !loading && (
-            <p
-              className={cn(
-                'text-sm font-medium',
-                trend.isPositive ? 'text-success' : 'text-destructive'
-              )}
-            >
-              {trend.isPositive ? '+' : ''}{trend.value}% from last month
-            </p>
-          )}
         </div>
         <div className={cn('p-3 rounded-lg', iconBgStyles[variant])}>
           <Icon className={cn('w-6 h-6', variantStyles[variant])} />
