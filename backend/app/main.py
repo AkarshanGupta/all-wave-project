@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import project, meeting, risk, resource, status
 import os
+import uvicorn
 
 app = FastAPI(
     title="PMO Intelligence Platform",
@@ -40,3 +41,12 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 10000))
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=port,
+        reload=False,
+    )
