@@ -23,6 +23,7 @@ interface DataTableProps<T> {
   loading?: boolean;
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  customActions?: (item: T) => React.ReactNode;
 }
 
 export function DataTable<T extends { id?: string }>({
@@ -31,6 +32,7 @@ export function DataTable<T extends { id?: string }>({
   loading = false,
   onEdit,
   onDelete,
+  customActions,
 }: DataTableProps<T>) {
   if (loading) {
     return (
@@ -79,7 +81,7 @@ export function DataTable<T extends { id?: string }>({
             {columns.map((col) => (
               <TableHead key={col.key as string}>{col.label}</TableHead>
             ))}
-            {(onEdit || onDelete) && (
+            {(onEdit || onDelete || customActions) && (
               <TableHead className="w-24 text-right">Actions</TableHead>
             )}
           </TableRow>
@@ -100,9 +102,10 @@ export function DataTable<T extends { id?: string }>({
                     : String((item as Record<string, unknown>)[col.key as string] ?? '')}
                 </TableCell>
               ))}
-              {(onEdit || onDelete) && (
+              {(onEdit || onDelete || customActions) && (
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
+                    {customActions && customActions(item)}
                     {onEdit && (
                       <Button
                         variant="ghost"

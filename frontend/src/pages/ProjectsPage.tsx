@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, FolderKanban } from 'lucide-react';
+import { Plus, FolderKanban, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable, Column } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { ProjectDialog } from '@/components/dialogs/ProjectDialog';
-import { getProjects, createProject, updateProject, deleteProject, Project } from '@/lib/api';
+import { getProjects, createProject, updateProject, deleteProject, Project, analyzeProjectDocumentation } from '@/lib/api';
 import { toast } from '@/hooks/use-toast';
 
 export default function ProjectsPage() {
@@ -87,6 +87,24 @@ export default function ProjectsPage() {
     }
   };
 
+  const handleAnalyzeRisks = async (project: Project) => {
+    if (!project.id) return;
+    try {
+      toast({ title: 'Analyzing...', description: 'Processing project documentation with AI' });
+      const risks = await analyzeProjectDocumentation(project.id);
+      toast({ 
+        title: 'Analysis Complete', 
+        description: `Identified ${risks.length} potential risks. Check the Risks page.` 
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Analysis Failed',
+        description: error.response?.data?.detail || 'Failed to analyze project documentation',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const columns: Column<Project>[] = [
     { key: 'name', label: 'Name' },
     { key: 'description', label: 'Description' },
@@ -135,6 +153,16 @@ export default function ProjectsPage() {
           loading={loading}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          customActions={(project) => (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleAnalyzeRisks(project)}
+              title="Analyze project documentation for risks"
+            >
+              <Brain className="w-4 h-4 text-blue-500" />
+            </Button>
+          )}
         />
       </motion.div>
 

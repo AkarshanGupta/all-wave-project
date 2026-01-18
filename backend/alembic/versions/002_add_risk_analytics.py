@@ -1,7 +1,7 @@
 """Add risk analytics fields to risks table
 
-Revision ID: 002_add_risk_analytics
-Revises: 001_initial_migration
+Revision ID: 002
+Revises: 001
 Create Date: 2026-01-18 17:24:32.000000
 
 """
@@ -11,8 +11,8 @@ from sqlalchemy import text
 
 
 # revision identifiers, used by Alembic.
-revision = '002_add_risk_analytics'
-down_revision = '001_initial_migration'
+revision = '002'
+down_revision = '001'
 branch_labels = None
 depends_on = None
 

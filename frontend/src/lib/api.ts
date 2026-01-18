@@ -116,6 +116,11 @@ export const deleteRisk = async (id: string | number) => {
   return response.data;
 };
 
+export const analyzeProjectDocumentation = async (projectId: string | number) => {
+  const response = await api.post(`/risks/analyze-project/${projectId}`);
+  return response.data;
+};
+
 // Resources
 export interface Resource {
   id?: string;
