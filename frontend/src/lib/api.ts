@@ -56,13 +56,20 @@ export const deleteProject = async (id: number) => {
 
 // Meetings
 export interface Meeting {
-  id?: string;
-  project_id: string | number;
+  id?: number;
+  project_id: number;
   title: string;
   raw_text: string;
   summary?: string;
   decisions?: string;
   open_questions?: string;
+  date?: string;
+  time?: string;
+  duration?: number;
+  attendees?: string[];
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const getMeetings = async () => {
@@ -75,12 +82,12 @@ export const createMeeting = async (meeting: Meeting) => {
   return response.data;
 };
 
-export const updateMeeting = async (id: string, meeting: Partial<Meeting>) => {
+export const updateMeeting = async (id: number, meeting: Partial<Meeting>) => {
   const response = await api.put(`/meetings/${id}`, meeting);
   return response.data;
 };
 
-export const deleteMeeting = async (id: string) => {
+export const deleteMeeting = async (id: number) => {
   const response = await api.delete(`/meetings/${id}`);
   return response.data;
 };

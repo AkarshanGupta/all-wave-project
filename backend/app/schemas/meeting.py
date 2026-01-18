@@ -35,11 +35,21 @@ class MeetingCreate(BaseModel):
     title: str
     raw_text: str
     summary: Optional[str] = None
+    date: Optional[str] = None  # YYYY-MM-DD format
+    time: Optional[str] = None  # HH:MM format
+    duration: Optional[int] = None  # minutes
+    attendees: Optional[List[str]] = None
+    status: Optional[str] = "scheduled"
 
 
 class MeetingUpdate(BaseModel):
     title: Optional[str] = None
     summary: Optional[str] = None
+    date: Optional[str] = None
+    time: Optional[str] = None
+    duration: Optional[int] = None
+    attendees: Optional[List[str]] = None
+    status: Optional[str] = None
 
 
 class MeetingResponse(BaseModel):
@@ -50,6 +60,11 @@ class MeetingResponse(BaseModel):
     summary: Optional[str]
     decisions: Optional[str]
     open_questions: Optional[str]
+    date: Optional[str]
+    time: Optional[str]
+    duration: Optional[int]
+    attendees: Optional[List[str]]
+    status: Optional[str]
     created_at: datetime
     updated_at: Optional[datetime]
 

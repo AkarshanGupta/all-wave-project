@@ -44,20 +44,33 @@ export function MeetingDialog({
     defaultValues: {
       title: '',
       raw_text: '',
-      project_id: '',
+      project_id: 0,
       summary: '',
+      date: new Date().toISOString().split('T')[0],
+      time: '09:00',
+      duration: 60,
+      attendees: [],
+      status: 'scheduled',
     },
   });
 
   useEffect(() => {
     if (meeting) {
-      form.reset(meeting);
+      form.reset({
+        ...meeting,
+        attendees: meeting.attendees || [],
+      });
     } else {
       form.reset({
         title: '',
         raw_text: '',
-        project_id: '',
+        project_id: 0,
         summary: '',
+        date: new Date().toISOString().split('T')[0],
+        time: '09:00',
+        duration: 60,
+        attendees: [],
+        status: 'scheduled',
       });
     }
   }, [meeting, form]);
@@ -85,7 +98,12 @@ export function MeetingDialog({
                   <FormItem className="col-span-2">
                     <FormLabel>Project ID</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter project ID" type="number" {...field} />
+                      <Input 
+                        placeholder="Enter project ID" 
+                        type="number" 
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -101,6 +119,105 @@ export function MeetingDialog({
                     <FormLabel>Meeting Title</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter meeting title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="date"
+                rules={{ required: 'Date is required' }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="time"
+                rules={{ required: 'Time is required' }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Time</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="duration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duration (minutes)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        placeholder="60" 
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="scheduled">Scheduled</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="attendees"
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel>Attendees (comma-separated)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="John Doe, Jane Smith, Bob Johnson" 
+                        value={field.value?.join(', ') || ''}
+                        onChange={(e) => {
+                          const attendees = e.target.value
+                            .split(',')
+                            .map(a => a.trim())
+                            .filter(a => a.length > 0);
+                          field.onChange(attendees);
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

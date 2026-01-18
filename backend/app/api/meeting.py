@@ -45,6 +45,11 @@ async def create_meeting(
         title=meeting_data.title,
         raw_text=meeting_data.raw_text,
         summary=meeting_data.summary,
+        date=meeting_data.date,
+        time=meeting_data.time,
+        duration=meeting_data.duration,
+        attendees=meeting_data.attendees,
+        status=meeting_data.status or "scheduled",
     )
     db.add(meeting)
     await db.commit()
@@ -89,6 +94,16 @@ async def update_meeting(
         meeting.title = meeting_data.title
     if meeting_data.summary is not None:
         meeting.summary = meeting_data.summary
+    if meeting_data.date is not None:
+        meeting.date = meeting_data.date
+    if meeting_data.time is not None:
+        meeting.time = meeting_data.time
+    if meeting_data.duration is not None:
+        meeting.duration = meeting_data.duration
+    if meeting_data.attendees is not None:
+        meeting.attendees = meeting_data.attendees
+    if meeting_data.status is not None:
+        meeting.status = meeting_data.status
     
     db.add(meeting)
     await db.commit()

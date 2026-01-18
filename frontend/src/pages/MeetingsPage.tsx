@@ -89,12 +89,20 @@ export default function MeetingsPage() {
 
   const columns: Column<Meeting>[] = [
     { key: 'title', label: 'Title' },
-    { key: 'date', label: 'Date' },
-    { key: 'time', label: 'Time' },
+    { 
+      key: 'date', 
+      label: 'Date',
+      render: (item) => item.date ? new Date(item.date).toLocaleDateString() : 'Not set'
+    },
+    { 
+      key: 'time', 
+      label: 'Time',
+      render: (item) => item.time || 'Not set'
+    },
     {
       key: 'duration',
       label: 'Duration',
-      render: (item) => `${item.duration} min`,
+      render: (item) => item.duration ? `${item.duration} min` : 'Not set',
     },
     {
       key: 'attendees',
@@ -104,7 +112,7 @@ export default function MeetingsPage() {
     {
       key: 'status',
       label: 'Status',
-      render: (item) => <StatusBadge status={item.status} />,
+      render: (item) => <StatusBadge status={item.status || 'scheduled'} />,
     },
   ];
 

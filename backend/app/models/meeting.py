@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Date, Time, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -14,6 +14,11 @@ class Meeting(Base):
     summary = Column(Text, nullable=True)
     decisions = Column(Text, nullable=True)
     open_questions = Column(Text, nullable=True)
+    date = Column(Date, nullable=True)
+    time = Column(String(10), nullable=True)  # Store as "HH:MM" format
+    duration = Column(Integer, nullable=True)  # Duration in minutes
+    attendees = Column(JSON, nullable=True)  # List of attendee names
+    status = Column(String(50), default="scheduled")  # scheduled, completed, cancelled
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
