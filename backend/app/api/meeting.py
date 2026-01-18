@@ -32,6 +32,7 @@ async def create_meeting(
     # First, verify the project exists
     from app.models.project import Project
     from datetime import datetime
+    import json
     
     result = await db.execute(select(Project).where(Project.id == meeting_data.project_id))
     project = result.scalar_one_or_none()
@@ -50,6 +51,11 @@ async def create_meeting(
         except:
             pass
     
+    # Convert attendees list to JSON string
+    attendees_str = None
+    if meeting_data.attendees:
+        attendees_str = json.dumps(meeting_data.attendees)
+    
     meeting = Meeting(
         project_id=meeting_data.project_id,
         title=meeting_data.title,
@@ -58,7 +64,7 @@ async def create_meeting(
         date=date_obj,
         time=meeting_data.time,
         duration=meeting_data.duration,
-        attendees=meeting_data.attendees,
+        attendees=attendees_str,
         status=meeting_data.status or "scheduled",
     )
     db.add(meeting)
@@ -95,6 +101,7 @@ async def update_meeting(
 ):
     """Update a meeting."""
     from datetime import datetime
+    import json
     
     result = await db.execute(select(Meeting).where(Meeting.id == meeting_id))
     meeting = result.scalar_one_or_none()
@@ -116,7 +123,7 @@ async def update_meeting(
     if meeting_data.duration is not None:
         meeting.duration = meeting_data.duration
     if meeting_data.attendees is not None:
-        meeting.attendees = meeting_data.attendees
+        meeting.attendees = json.dumps(meeting_data.attendees)
     if meeting_data.status is not None:
         meeting.status = meeting_data.status
     

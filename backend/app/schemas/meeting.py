@@ -1,6 +1,7 @@
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, field_validator
 from datetime import datetime, date
 from typing import Optional, List
+import json
 
 
 class ActionItemCreate(BaseModel):
@@ -79,5 +80,18 @@ class MeetingResponse(BaseModel):
                 return value.strftime("%Y-%m-%d")
             return str(value)
         return None
+    
+    @field_validator('attendees', mode='before')
+    @classmethod
+    def parse_attendees(cls, value):
+        """Parse attendees from JSON string if needed."""
+        if value is None:
+            return []
+        if isinstance(value, str):
+            try:
+                return json.loads(value) if value else []
+            except:
+                return []
+        return value if isinstance(value, list) else []
 
 
