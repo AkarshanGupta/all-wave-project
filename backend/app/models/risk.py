@@ -29,6 +29,7 @@ class Risk(Base):
     is_escalated = Column(Integer, nullable=True, default=0)
 
     project = relationship("Project", back_populates="risks")
+    metrics = relationship("RiskMetric", back_populates="risk", cascade="all, delete-orphan")
 
 
 

@@ -42,15 +42,15 @@ class RiskResponse(BaseModel):
     probability: int
     impact: int
     severity: str
-    risk_score: Optional[float] = None
+    risk_score: Optional[float] = 0.0
     trend: Optional[str] = "stable"
-    mitigation_plan: Optional[str]
-    status: Optional[str]
+    mitigation_plan: Optional[str] = None
+    status: Optional[str] = "open"
     approval_status: Optional[str] = "pending"
     approved_by: Optional[str] = None
-    is_escalated: int = 0
+    is_escalated: Optional[int] = 0
     created_at: datetime
-    updated_at: Optional[datetime]
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
