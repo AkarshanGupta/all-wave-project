@@ -61,6 +61,28 @@ async def create_resource_endpoint(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.delete("/{resource_id}", status_code=204)
+async def delete_resource_endpoint(
+    resource_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete a resource."""
+    from app.models.resource import Resource
+    from sqlalchemy import select
+    
+    result = await db.execute(
+        select(Resource).where(Resource.id == resource_id)
+    )
+    resource = result.scalar_one_or_none()
+    
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource not found")
+    
+    await db.delete(resource)
+    await db.commit()
+    return None
+
+
 @router.post("/allocate", response_model=AllocationResponse, status_code=201)
 async def allocate_resource_endpoint(
     allocation_data: AllocationCreate,
