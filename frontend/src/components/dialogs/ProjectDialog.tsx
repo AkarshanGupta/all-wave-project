@@ -45,11 +45,9 @@ export function ProjectDialog({
       name: '',
       description: '',
       status: 'active',
-      priority: 'medium',
+      priority: 5,
       start_date: '',
-      end_date: '',
-      budget: 0,
-      owner: '',
+      deadline: '',
     },
   });
 
@@ -61,11 +59,9 @@ export function ProjectDialog({
         name: '',
         description: '',
         status: 'active',
-        priority: 'medium',
+        priority: 5,
         start_date: new Date().toISOString().split('T')[0],
-        end_date: '',
-        budget: 0,
-        owner: '',
+        deadline: '',
       });
     }
   }, [project, form]);
@@ -149,10 +145,10 @@ export function ProjectDialog({
                 name="priority"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Priority</FormLabel>
+                    <FormLabel>Priority (1-10)</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      defaultValue={field.value?.toString()}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -160,10 +156,12 @@ export function ProjectDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="critical">Critical</SelectItem>
+                        <SelectItem value="1">1 - Lowest</SelectItem>
+                        <SelectItem value="3">3 - Low</SelectItem>
+                        <SelectItem value="5">5 - Medium</SelectItem>
+                        <SelectItem value="7">7 - High</SelectItem>
+                        <SelectItem value="9">9 - Critical</SelectItem>
+                        <SelectItem value="10">10 - Urgent</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -188,46 +186,12 @@ export function ProjectDialog({
 
               <FormField
                 control={form.control}
-                name="end_date"
-                rules={{ required: 'End date is required' }}
+                name="deadline"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>End Date</FormLabel>
+                    <FormLabel>Deadline</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="budget"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Budget</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Enter budget"
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="owner"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Owner</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter owner name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

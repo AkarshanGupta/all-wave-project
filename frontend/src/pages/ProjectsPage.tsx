@@ -116,11 +116,12 @@ export default function ProjectsPage() {
     {
       key: 'priority',
       label: 'Priority',
-      render: (item) => <StatusBadge status={item.priority} />,
+      render: (item) => (
+        <span className="font-medium">{item.priority || 5}/10</span>
+      ),
     },
     { key: 'start_date', label: 'Start Date' },
-    { key: 'end_date', label: 'End Date' },
-    { key: 'owner', label: 'Owner' },
+    { key: 'deadline', label: 'Deadline' },
   ];
 
   return (

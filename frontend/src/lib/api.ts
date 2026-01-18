@@ -27,6 +27,11 @@ export interface Project {
   name: string;
   description?: string;
   status?: string;
+  priority?: number;  // 1-10 scale
+  start_date?: string;
+  deadline?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const getProjects = async () => {
