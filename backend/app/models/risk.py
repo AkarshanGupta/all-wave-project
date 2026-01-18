@@ -15,17 +15,18 @@ class Risk(Base):
     probability = Column(Integer, nullable=False)
     impact = Column(Integer, nullable=False)
     severity = Column(String(50), nullable=False)
-    risk_score = Column(Float, nullable=True)  # 0-100 score
-    trend = Column(String(20), default="stable")  # increasing, decreasing, stable
+    risk_score = Column(Float, nullable=True, default=None)  # Will be populated after migration
+    trend = Column(String(20), default="stable", nullable=True)  # Will be populated after migration
     mitigation_plan = Column(Text, nullable=True)
-    status = Column(String(50), default="open")  # open, mitigating, resolved, accepted
-    approval_status = Column(String(50), default="pending")  # pending, approved, rejected
+    status = Column(String(50), default="open")
+    approval_status = Column(String(50), default="pending", nullable=True)  # Will be populated after migration
     approved_by = Column(String(255), nullable=True)
-    is_escalated = Column(Integer, default=0)  # Boolean flag for early warning
+    is_escalated = Column(Integer, default=0, nullable=True)  # Will be populated after migration
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     project = relationship("Project", back_populates="risks")
     metrics = relationship("RiskMetric", back_populates="risk", cascade="all, delete-orphan")
+
 
 

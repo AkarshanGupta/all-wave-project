@@ -69,9 +69,16 @@ async def get_all_risks(
     db: AsyncSession = Depends(get_db)
 ):
     """Get all risks."""
-    result = await db.execute(select(Risk).order_by(Risk.created_at.desc()))
-    risks = result.scalars().all()
-    return list(risks)
+    try:
+        result = await db.execute(select(Risk).order_by(Risk.created_at.desc()))
+        risks = result.scalars().all()
+        return list(risks)
+    except Exception as e:
+        # Log the error but return empty list if schema is being migrated
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error fetching risks: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching risks: {str(e)}")
 
 
 @router.get("/{project_id}", response_model=List[RiskResponse])
