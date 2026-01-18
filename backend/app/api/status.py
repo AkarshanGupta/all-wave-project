@@ -1,11 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import List
 from app.core.database import get_db
 from app.models.status_report import StatusReport
 from app.schemas.status_report import StatusReportResponse
 from app.services.status_service import generate_status_report, get_status_report_by_project
 
 router = APIRouter(prefix="/status", tags=["status"])
+
+
+@router.get("", response_model=List[StatusReportResponse])
+async def get_all_status_reports(
+    db: AsyncSession = Depends(get_db)
+):
+    """Get all status reports."""
+    from sqlalchemy import select
+    result = await db.execute(select(StatusReport))
+    reports = result.scalars().all()
+    return reports
 
 
 @router.post("/generate/{project_id}", response_model=StatusReportResponse, status_code=201)
