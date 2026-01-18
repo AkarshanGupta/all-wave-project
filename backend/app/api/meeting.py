@@ -108,37 +108,46 @@ async def update_meeting(
     db: AsyncSession = Depends(get_db)
 ):
     """Update a meeting."""
-    from datetime import datetime
-    import json
-    
-    result = await db.execute(select(Meeting).where(Meeting.id == meeting_id))
-    meeting = result.scalar_one_or_none()
-    
-    if not meeting:
-        raise HTTPException(status_code=404, detail="Meeting not found")
-    
-    if meeting_data.title is not None:
-        meeting.title = meeting_data.title
-    if meeting_data.summary is not None:
-        meeting.summary = meeting_data.summary
-    if meeting_data.date is not None:
-        try:
-            meeting.date = datetime.strptime(meeting_data.date, "%Y-%m-%d").date()
-        except:
-            meeting.date = None
-    if meeting_data.time is not None:
-        meeting.time = meeting_data.time
-    if meeting_data.duration is not None:
-        meeting.duration = meeting_data.duration
-    if meeting_data.attendees is not None:
-        meeting.attendees = json.dumps(meeting_data.attendees)
-    if meeting_data.status is not None:
-        meeting.status = meeting_data.status
-    
-    db.add(meeting)
-    await db.commit()
-    await db.refresh(meeting)
-    return meeting
+    try:
+        from datetime import datetime
+        import json
+        
+        result = await db.execute(select(Meeting).where(Meeting.id == meeting_id))
+        meeting = result.scalar_one_or_none()
+        
+        if not meeting:
+            raise HTTPException(status_code=404, detail="Meeting not found")
+        
+        if meeting_data.title is not None:
+            meeting.title = meeting_data.title
+        if meeting_data.summary is not None:
+            meeting.summary = meeting_data.summary
+        if meeting_data.date is not None:
+            try:
+                meeting.date = datetime.strptime(meeting_data.date, "%Y-%m-%d").date()
+            except Exception as e:
+                print(f"Date parsing error in update: {e}")
+                meeting.date = None
+        if meeting_data.time is not None:
+            meeting.time = meeting_data.time
+        if meeting_data.duration is not None:
+            meeting.duration = meeting_data.duration
+        if meeting_data.attendees is not None:
+            meeting.attendees = json.dumps(meeting_data.attendees)
+        if meeting_data.status is not None:
+            meeting.status = meeting_data.status
+        
+        db.add(meeting)
+        await db.commit()
+        await db.refresh(meeting)
+        return meeting
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        print(f"Error updating meeting {meeting_id}: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Failed to update meeting: {str(e)}")
 
 
 @router.delete("/{meeting_id}", status_code=204)
