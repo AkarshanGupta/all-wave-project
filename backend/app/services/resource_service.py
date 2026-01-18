@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 from typing import List
 from decimal import Decimal
 from app.models.resource import Resource, Allocation
@@ -36,7 +37,15 @@ async def create_resource(
             db.add(skill)
     
     await db.commit()
-    await db.refresh(resource)
+    
+    # Reload resource with relationships
+    result = await db.execute(
+        select(Resource)
+        .where(Resource.id == resource.id)
+        .options(selectinload(Resource.allocations))
+        .options(selectinload(Resource.skills))
+    )
+    resource = result.scalar_one()
     
     return resource
 
@@ -92,16 +101,10 @@ async def get_resources_by_project(
     result = await db.execute(
         select(Resource)
         .where(Resource.project_id == project_id)
+        .options(selectinload(Resource.allocations))
+        .options(selectinload(Resource.skills))
         .order_by(Resource.created_at.desc())
     )
     resources = result.scalars().all()
-    
-    for resource in resources:
-        allocations_result = await db.execute(
-            select(Allocation)
-            .where(Allocation.resource_id == resource.id)
-        )
-        resource.allocations = list(allocations_result.scalars().all())
-    
     return list(resources)
 

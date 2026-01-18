@@ -37,7 +37,13 @@ async def get_all_resources(
     """Get all resources."""
     from app.models.resource import Resource
     from sqlalchemy import select
-    result = await db.execute(select(Resource))
+    from sqlalchemy.orm import selectinload
+    
+    result = await db.execute(
+        select(Resource)
+        .options(selectinload(Resource.allocations))
+        .options(selectinload(Resource.skills))
+    )
     resources = result.scalars().all()
     return resources
 
