@@ -41,11 +41,6 @@ export function AppLayout() {
             <Outlet />
           </motion.div>
         </main>
-        <footer className="h-12 flex items-center justify-center border-t border-border bg-card">
-          <p className="text-sm text-muted-foreground">
-            © 2025 PMO Intelligence Platform. All rights reserved.
-          </p>
-        </footer>
       </motion.div>
     </div>
   );
