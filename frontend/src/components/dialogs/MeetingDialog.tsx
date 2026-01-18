@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Dialog,
@@ -40,6 +40,8 @@ export function MeetingDialog({
   meeting,
   onSave,
 }: MeetingDialogProps) {
+  const [attendeesText, setAttendeesText] = useState('');
+  
   const form = useForm<Meeting>({
     defaultValues: {
       title: '',
@@ -60,6 +62,7 @@ export function MeetingDialog({
         ...meeting,
         attendees: meeting.attendees || [],
       });
+      setAttendeesText(meeting.attendees?.join(', ') || '');
     } else {
       form.reset({
         title: '',
@@ -72,11 +75,17 @@ export function MeetingDialog({
         attendees: [],
         status: 'scheduled',
       });
+      setAttendeesText('');
     }
   }, [meeting, form]);
 
   const onSubmit = (data: Meeting) => {
-    onSave(data);
+    // Convert attendees text to array before saving
+    const attendeesArray = attendeesText
+      .split(',')
+      .map(a => a.trim())
+      .filter(a => a.length > 0);
+    onSave({ ...data, attendees: attendeesArray });
   };
 
   return (
@@ -209,14 +218,8 @@ export function MeetingDialog({
                     <FormControl>
                       <Input 
                         placeholder="John Doe, Jane Smith, Bob Johnson" 
-                        value={field.value?.join(', ') || ''}
-                        onChange={(e) => {
-                          const attendees = e.target.value
-                            .split(',')
-                            .map(a => a.trim())
-                            .filter(a => a.length > 0);
-                          field.onChange(attendees);
-                        }}
+                        value={attendeesText}
+                        onChange={(e) => setAttendeesText(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
