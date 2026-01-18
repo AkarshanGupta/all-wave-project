@@ -217,10 +217,13 @@ async def analyze_project_documentation(
         print(f"Error in analyze_project_documentation: {str(e)}")
         print(traceback.format_exc())
         raise
+
+
+async def get_risks_by_project(
     db: AsyncSession,
     project_id: int
 ) -> List[Risk]:
-    """Automatically analyze all project documentation for risks."""
+    """Get all risks for a specific project."""
     from app.models.project import Project
     from app.models.status_report import StatusReport
     from app.models.resource import Resource
