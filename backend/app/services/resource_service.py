@@ -3,6 +3,7 @@ from sqlalchemy import select, func
 from typing import List
 from decimal import Decimal
 from app.models.resource import Resource, Allocation
+from app.models.resource_skill import ResourceSkill
 from app.schemas.resource import ResourceCreate, AllocationCreate
 
 
@@ -10,16 +11,30 @@ async def create_resource(
     db: AsyncSession,
     resource_data: ResourceCreate
 ) -> Resource:
-    """Create a new resource."""
+    """Create a new resource with optional skills."""
     resource = Resource(
         project_id=resource_data.project_id,
         name=resource_data.name,
         role=resource_data.role,
         capacity_hours=resource_data.capacity_hours,
         availability_hours=resource_data.availability_hours,
+        department=resource_data.department,
+        location=resource_data.location,
     )
     
     db.add(resource)
+    await db.flush()  # Get resource ID
+    
+    # Add skills if provided
+    if resource_data.skills:
+        for skill_data in resource_data.skills:
+            skill = ResourceSkill(
+                resource_id=resource.id,
+                skill_name=skill_data.skill_name,
+                proficiency_level=skill_data.proficiency_level
+            )
+            db.add(skill)
+    
     await db.commit()
     await db.refresh(resource)
     

@@ -13,11 +13,14 @@ class Resource(Base):
     role = Column(String(100), nullable=False)
     capacity_hours = Column(Numeric(10, 2), nullable=False)
     availability_hours = Column(Numeric(10, 2), nullable=False)
+    department = Column(String(100), nullable=True)
+    location = Column(String(100), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     project = relationship("Project", back_populates="resources")
     allocations = relationship("Allocation", back_populates="resource", cascade="all, delete-orphan")
+    skills = relationship("ResourceSkill", back_populates="resource", cascade="all, delete-orphan")
 
 
 class Allocation(Base):

@@ -11,6 +11,9 @@ class Project(Base):
     name = Column(String(255), nullable=False, index=True)
     description = Column(Text, nullable=True)
     status = Column(String(50), default="active")
+    priority = Column(Integer, default=5)  # 1-10 scale, 10 being highest
+    start_date = Column(DateTime(timezone=True), nullable=True)
+    deadline = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -18,4 +21,5 @@ class Project(Base):
     risks = relationship("Risk", back_populates="project", cascade="all, delete-orphan")
     resources = relationship("Resource", back_populates="project", cascade="all, delete-orphan")
     status_reports = relationship("StatusReport", back_populates="project", cascade="all, delete-orphan")
+    requirements = relationship("ProjectRequirement", back_populates="project", cascade="all, delete-orphan")
 
