@@ -12,7 +12,7 @@ app = FastAPI(
 # Configure CORS with environment-aware origins
 allowed_origins = os.getenv(
     "ALLOWED_ORIGINS",
-    "http://localhost:8080,http://localhost:5173,http://127.0.0.1:8080,http://127.0.0.1:5173"
+    "http://localhost:8080,http://localhost:5173,http://127.0.0.1:8080,http://127.0.0.1:5173,https://all-wave-project.onrender.com,https://all-wave-project-ol5h.vercel.app"
 ).split(",")
 
 app.add_middleware(
