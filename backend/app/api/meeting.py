@@ -29,48 +29,56 @@ async def create_meeting(
     db: AsyncSession = Depends(get_db)
 ):
     """Create a new meeting."""
-    # First, verify the project exists
-    from app.models.project import Project
-    from datetime import datetime
-    import json
-    
-    result = await db.execute(select(Project).where(Project.id == meeting_data.project_id))
-    project = result.scalar_one_or_none()
-    
-    if not project:
-        raise HTTPException(
-            status_code=404, 
-            detail=f"Project with id {meeting_data.project_id} not found. Please create the project first."
+    try:
+        # First, verify the project exists
+        from app.models.project import Project
+        from datetime import datetime
+        import json
+        
+        result = await db.execute(select(Project).where(Project.id == meeting_data.project_id))
+        project = result.scalar_one_or_none()
+        
+        if not project:
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Project with id {meeting_data.project_id} not found. Please create the project first."
+            )
+        
+        # Convert date string to date object if provided
+        date_obj = None
+        if meeting_data.date:
+            try:
+                date_obj = datetime.strptime(meeting_data.date, "%Y-%m-%d").date()
+            except Exception as e:
+                print(f"Date parsing error: {e}")
+        
+        # Convert attendees list to JSON string
+        attendees_str = None
+        if meeting_data.attendees:
+            attendees_str = json.dumps(meeting_data.attendees)
+        
+        meeting = Meeting(
+            project_id=meeting_data.project_id,
+            title=meeting_data.title,
+            raw_text=meeting_data.raw_text,
+            summary=meeting_data.summary,
+            date=date_obj,
+            time=meeting_data.time,
+            duration=meeting_data.duration,
+            attendees=attendees_str,
+            status=meeting_data.status or "scheduled",
         )
-    
-    # Convert date string to date object if provided
-    date_obj = None
-    if meeting_data.date:
-        try:
-            date_obj = datetime.strptime(meeting_data.date, "%Y-%m-%d").date()
-        except:
-            pass
-    
-    # Convert attendees list to JSON string
-    attendees_str = None
-    if meeting_data.attendees:
-        attendees_str = json.dumps(meeting_data.attendees)
-    
-    meeting = Meeting(
-        project_id=meeting_data.project_id,
-        title=meeting_data.title,
-        raw_text=meeting_data.raw_text,
-        summary=meeting_data.summary,
-        date=date_obj,
-        time=meeting_data.time,
-        duration=meeting_data.duration,
-        attendees=attendees_str,
-        status=meeting_data.status or "scheduled",
-    )
-    db.add(meeting)
-    await db.commit()
-    await db.refresh(meeting)
-    return meeting
+        db.add(meeting)
+        await db.commit()
+        await db.refresh(meeting)
+        return meeting
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        print(f"Error creating meeting: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Failed to create meeting: {str(e)}")
 
 
 @router.get("", response_model=List[MeetingResponse])
