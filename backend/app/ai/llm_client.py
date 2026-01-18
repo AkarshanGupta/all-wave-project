@@ -3,7 +3,8 @@ from groq import AsyncGroq
 from typing import Dict, Any, Optional
 from app.core.config import settings
 
-client = AsyncGroq(api_key=settings.groq_api_key)
+# Initialize client only if API key is available
+client = AsyncGroq(api_key=settings.groq_api_key) if settings.groq_api_key else None
 
 
 async def call_llm(prompt: str, system_prompt: Optional[str] = None, temperature: Optional[float] = None) -> Dict[str, Any]:
@@ -11,6 +12,12 @@ async def call_llm(prompt: str, system_prompt: Optional[str] = None, temperature
     Centralized LLM client for Groq API calls.
     Returns structured JSON output.
     """
+    if not client or not settings.groq_api_key:
+        raise ValueError(
+            "AI service not available. GROQ_API_KEY environment variable is not set. "
+            "Get a free API key at https://console.groq.com"
+        )
+    
     messages = []
     if system_prompt:
         messages.append({"role": "system", "content": system_prompt})

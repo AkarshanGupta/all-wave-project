@@ -42,7 +42,19 @@ async def analyze_project_docs(
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        error_msg = str(e)
+        print(f"Error analyzing project {project_id}: {error_msg}")
+        print(traceback.format_exc())
+        
+        # Check if it's an API key issue
+        if "api_key" in error_msg.lower() or "authentication" in error_msg.lower():
+            raise HTTPException(
+                status_code=503, 
+                detail="AI service not configured. Please add GROQ_API_KEY to environment variables."
+            )
+        
+        raise HTTPException(status_code=500, detail=f"Failed to analyze project: {error_msg}")
 
 
 @router.get("/analytics/{project_id}", response_model=RiskAnalyticsResponse)
