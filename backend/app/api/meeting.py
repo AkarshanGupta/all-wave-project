@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
+import json
 from app.core.database import get_db
 from app.models.meeting import Meeting
 from app.schemas.meeting import MeetingUpload, MeetingResponse, MeetingCreate, MeetingUpdate
@@ -88,7 +89,29 @@ async def get_all_meetings(
     """Get all meetings."""
     result = await db.execute(select(Meeting).order_by(Meeting.created_at.desc()))
     meetings = result.scalars().all()
-    return list(meetings)
+    
+    # Convert to response objects with proper serialization
+    response_meetings = []
+    for meeting in meetings:
+        meeting_dict = {
+            'id': meeting.id,
+            'project_id': meeting.project_id,
+            'title': meeting.title,
+            'raw_text': meeting.raw_text,
+            'summary': meeting.summary,
+            'decisions': meeting.decisions,
+            'open_questions': meeting.open_questions,
+            'date': meeting.date.strftime("%Y-%m-%d") if meeting.date else None,
+            'time': meeting.time,
+            'duration': meeting.duration,
+            'attendees': json.loads(meeting.attendees) if meeting.attendees else [],
+            'status': meeting.status or 'scheduled',
+            'created_at': meeting.created_at,
+            'updated_at': meeting.updated_at,
+        }
+        response_meetings.append(meeting_dict)
+    
+    return response_meetings
 
 
 @router.get("/{project_id}", response_model=List[MeetingResponse])
