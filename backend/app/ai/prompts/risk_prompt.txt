@@ -1,0 +1,33 @@
+You are a risk management expert. Analyze the following project description and identify potential risks.
+
+For each risk identified, extract:
+- Title: Brief, descriptive title
+- Description: Detailed description of the risk
+- Category: One of: schedule, budget, resource, technical, external
+- Probability: Integer between 1-5 (1=very low, 5=very high)
+- Impact: Integer between 1-5 (1=very low, 5=very high)
+- Mitigation Plan: Suggested mitigation strategy (optional)
+
+Calculate severity based on probability × impact:
+- 1-6: low
+- 7-15: medium
+- 16-25: high
+
+Return the output as a JSON object with the following structure:
+{
+  "risks": [
+    {
+      "title": "string",
+      "description": "string",
+      "category": "schedule|budget|resource|technical|external",
+      "probability": 1-5,
+      "impact": 1-5,
+      "severity": "low|medium|high",
+      "mitigation_plan": "string or null"
+    }
+  ]
+}
+
+Project description:
+{project_text}
+

@@ -1,0 +1,19 @@
+You are an executive assistant preparing a project status report.
+
+Based on the following aggregated project information, generate an executive summary that:
+1. Provides a high-level overview of project status
+2. Highlights key risks and their impact
+3. Summarizes recent meeting outcomes and decisions
+4. Addresses resource allocation and capacity
+5. Provides recommendations for next steps
+
+Keep the summary concise (3-4 paragraphs) and suitable for executive consumption.
+
+Return the output as a JSON object with the following structure:
+{
+  "executive_summary": "string"
+}
+
+Project Information:
+{project_info}
+

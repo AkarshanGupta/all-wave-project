@@ -1,0 +1,25 @@
+You are an expert meeting analyst. Analyze the following meeting transcript/text and extract structured information.
+
+Extract:
+1. Summary: A concise summary of the meeting (2-3 paragraphs)
+2. Decisions: List all decisions made during the meeting
+3. Open Questions: List all unanswered questions or topics requiring follow-up
+4. Action Items: List all action items with assignees (if mentioned) and due dates (if mentioned)
+
+Return the output as a JSON object with the following structure:
+{
+  "summary": "string",
+  "decisions": "string (bullet points or numbered list)",
+  "open_questions": "string (bullet points or numbered list)",
+  "action_items": [
+    {
+      "description": "string",
+      "assignee": "string or null",
+      "due_date": "string (ISO format) or null"
+    }
+  ]
+}
+
+Meeting text:
+{meeting_text}
+
