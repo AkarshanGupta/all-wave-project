@@ -8,6 +8,18 @@ from app.services.resource_service import create_resource, allocate_resource, ge
 router = APIRouter(prefix="/resources", tags=["resources"])
 
 
+@router.get("", response_model=List[ResourceResponse])
+async def get_all_resources(
+    db: AsyncSession = Depends(get_db)
+):
+    """Get all resources."""
+    from app.models.resource import Resource
+    from sqlalchemy import select
+    result = await db.execute(select(Resource))
+    resources = result.scalars().all()
+    return resources
+
+
 @router.post("", response_model=ResourceResponse, status_code=201)
 async def create_resource_endpoint(
     resource_data: ResourceCreate,
