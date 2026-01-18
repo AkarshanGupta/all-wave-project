@@ -19,6 +19,9 @@ async def create_project(
         name=project_data.name,
         description=project_data.description,
         status=project_data.status,
+        priority=project_data.priority,
+        start_date=project_data.start_date,
+        deadline=project_data.deadline,
     )
     db.add(project)
     await db.commit()
@@ -70,6 +73,12 @@ async def update_project(
         project.description = project_data.description
     if project_data.status is not None:
         project.status = project_data.status
+    if project_data.priority is not None:
+        project.priority = project_data.priority
+    if project_data.start_date is not None:
+        project.start_date = project_data.start_date
+    if project_data.deadline is not None:
+        project.deadline = project_data.deadline
     
     db.add(project)
     await db.commit()

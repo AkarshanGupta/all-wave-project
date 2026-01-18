@@ -23,7 +23,7 @@ export const getApiInfo = async () => {
 
 // Projects
 export interface Project {
-  id?: string;
+  id?: number;
   name: string;
   description?: string;
   status?: string;
@@ -44,12 +44,12 @@ export const createProject = async (project: Project) => {
   return response.data;
 };
 
-export const updateProject = async (id: string, project: Partial<Project>) => {
+export const updateProject = async (id: number, project: Partial<Project>) => {
   const response = await api.put(`/projects/${id}`, project);
   return response.data;
 };
 
-export const deleteProject = async (id: string) => {
+export const deleteProject = async (id: number) => {
   const response = await api.delete(`/projects/${id}`);
   return response.data;
 };
@@ -87,16 +87,20 @@ export const deleteMeeting = async (id: string) => {
 
 // Risks
 export interface Risk {
-  id?: string | number;
-  project_id: string | number;
+  id?: number;
+  project_id: number;
   title: string;
   description: string;
   category: string;
   probability: number;
   impact: number;
   severity: string;
+  risk_score?: number;
+  trend?: string;
   mitigation_plan?: string;
   status?: string;
+  approval_status?: string;
+  approved_by?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -111,17 +115,17 @@ export const createRisk = async (risk: Risk) => {
   return response.data;
 };
 
-export const updateRisk = async (id: string | number, risk: Partial<Risk>) => {
+export const updateRisk = async (id: number, risk: Partial<Risk>) => {
   const response = await api.put(`/risks/${id}`, risk);
   return response.data;
 };
 
-export const deleteRisk = async (id: string | number) => {
+export const deleteRisk = async (id: number) => {
   const response = await api.delete(`/risks/${id}`);
   return response.data;
 };
 
-export const analyzeProjectDocumentation = async (projectId: string | number) => {
+export const analyzeProjectDocumentation = async (projectId: number) => {
   const response = await api.post(`/risks/analyze-project/${projectId}`);
   return response.data;
 };

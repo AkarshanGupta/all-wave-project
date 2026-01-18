@@ -106,6 +106,7 @@ export default function ProjectsPage() {
   };
 
   const columns: Column<Project>[] = [
+    { key: 'id', label: 'ID' },
     { key: 'name', label: 'Name' },
     { key: 'description', label: 'Description' },
     {
@@ -120,8 +121,16 @@ export default function ProjectsPage() {
         <span className="font-medium">{item.priority || 5}/10</span>
       ),
     },
-    { key: 'start_date', label: 'Start Date' },
-    { key: 'deadline', label: 'Deadline' },
+    { 
+      key: 'start_date', 
+      label: 'Start Date',
+      render: (item) => item.start_date ? new Date(item.start_date).toLocaleDateString() : 'N/A'
+    },
+    { 
+      key: 'deadline', 
+      label: 'Deadline',
+      render: (item) => item.deadline ? new Date(item.deadline).toLocaleDateString() : 'N/A'
+    },
   ];
 
   return (

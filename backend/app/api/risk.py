@@ -106,6 +106,9 @@ async def create_risk(
             detail=f"Project with id {risk_data.project_id} not found. Please create the project first."
         )
     
+    # Calculate risk score
+    risk_score = calculate_risk_score(risk_data.probability, risk_data.impact)
+    
     risk = Risk(
         project_id=risk_data.project_id,
         title=risk_data.title,
@@ -116,10 +119,17 @@ async def create_risk(
         severity=risk_data.severity,
         mitigation_plan=risk_data.mitigation_plan,
         status=risk_data.status,
+        risk_score=risk_score,
+        trend="stable",
     )
     db.add(risk)
     await db.commit()
     await db.refresh(risk)
+    
+    # Record initial metric for trend analysis
+    await record_risk_metric(db, risk.id, risk.probability, risk.impact, risk.severity)
+    await db.commit()
+    
     return risk
 
 
@@ -156,16 +166,39 @@ async def update_risk(
     if not risk:
         raise HTTPException(status_code=404, detail="Risk not found")
     
+    # Track if probability or impact changed for recalculation
+    needs_score_recalc = False
+    
     if risk_data.title is not None:
         risk.title = risk_data.title
     if risk_data.description is not None:
         risk.description = risk_data.description
+    if risk_data.category is not None:
+        risk.category = risk_data.category
+    if risk_data.severity is not None:
+        risk.severity = risk_data.severity
+    if risk_data.mitigation_plan is not None:
+        risk.mitigation_plan = risk_data.mitigation_plan
     if risk_data.probability is not None:
         risk.probability = risk_data.probability
+        needs_score_recalc = True
     if risk_data.impact is not None:
         risk.impact = risk_data.impact
+        needs_score_recalc = True
     if risk_data.status is not None:
         risk.status = risk_data.status
+    if risk_data.approval_status is not None:
+        risk.approval_status = risk_data.approval_status
+    if risk_data.approved_by is not None:
+        risk.approved_by = risk_data.approved_by
+    
+    # Recalculate risk score if probability or impact changed
+    if needs_score_recalc:
+        risk.risk_score = calculate_risk_score(risk.probability, risk.impact)
+        # Record metric for trend analysis
+        await record_risk_metric(db, risk.id, risk.probability, risk.impact, risk.severity)
+        # Update trend
+        risk.trend = await calculate_trend(db, risk.id)
     
     db.add(risk)
     await db.commit()

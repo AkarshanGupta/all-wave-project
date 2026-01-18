@@ -102,19 +102,32 @@ export default function RisksPage() {
     {
       key: 'probability',
       label: 'Probability',
-      render: (item) => <StatusBadge status={item.probability} />,
+      render: (item) => <span className="font-medium">{item.probability}/10</span>,
     },
     {
       key: 'impact',
       label: 'Impact',
-      render: (item) => <StatusBadge status={item.impact} />,
+      render: (item) => <span className="font-medium">{item.impact}/10</span>,
+    },
+    {
+      key: 'risk_score',
+      label: 'Risk Score',
+      render: (item) => {
+        const score = item.risk_score || 0;
+        const colorClass = score >= 70 ? 'text-red-600' : score >= 40 ? 'text-orange-600' : 'text-green-600';
+        return <span className={`font-bold ${colorClass}`}>{score.toFixed(1)}</span>;
+      },
+    },
+    {
+      key: 'severity',
+      label: 'Severity',
+      render: (item) => <StatusBadge status={item.severity} />,
     },
     {
       key: 'status',
       label: 'Status',
       render: (item) => <StatusBadge status={item.status} />,
     },
-    { key: 'owner', label: 'Owner' },
   ];
 
   return (
