@@ -126,11 +126,14 @@ async def analyze_project_documentation(
         
         if status_reports:
             for sr in status_reports[:5]:  # Last 5 reports
-                doc_parts.append(f"\nReport Date: {sr.report_date}")
-                doc_parts.append(f"Progress: {sr.progress_summary}")
-                doc_parts.append(f"Key Achievements: {sr.key_achievements or 'N/A'}")
-                doc_parts.append(f"Upcoming Milestones: {sr.upcoming_milestones or 'N/A'}")
-                doc_parts.append(f"Blockers: {sr.blockers or 'None'}")
+                doc_parts.append(f"\nGenerated At: {sr.generated_at}")
+                doc_parts.append(f"Executive Summary: {sr.executive_summary}")
+                if sr.risks_summary:
+                    doc_parts.append(f"Risks: {sr.risks_summary}")
+                if sr.meetings_summary:
+                    doc_parts.append(f"Meetings: {sr.meetings_summary}")
+                if sr.resources_summary:
+                    doc_parts.append(f"Resources: {sr.resources_summary}")
         else:
             doc_parts.append("No status reports available.")
         
