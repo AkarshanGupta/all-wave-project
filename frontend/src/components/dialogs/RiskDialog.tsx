@@ -350,4 +350,7 @@ export function RiskDialog({
               </div>
             )}
           </div>
-        )}
+        )}      </DialogContent>
+    </Dialog>
+  );
+}
