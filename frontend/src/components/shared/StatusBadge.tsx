@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-type Status = string;
+type Status = string | number;
 
 interface StatusBadgeProps {
   status: Status;
@@ -39,7 +39,7 @@ const statusStyles: Record<string, string> = {
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  if (!status) {
+  if (!status && status !== 0) {
     return (
       <Badge variant="outline" className={cn('capitalize', 'bg-muted text-muted-foreground border-border')}>
         Unknown
@@ -47,12 +47,14 @@ export function StatusBadge({ status }: StatusBadgeProps) {
     );
   }
   
-  const normalizedStatus = status.toLowerCase().replace(/\s+/g, '_');
+  // Convert to string and normalize
+  const statusString = String(status);
+  const normalizedStatus = statusString.toLowerCase().replace(/\s+/g, '_');
   const style = statusStyles[normalizedStatus] || 'bg-muted text-muted-foreground border-border';
   
   return (
     <Badge variant="outline" className={cn('capitalize', style)}>
-      {status.replace(/_/g, ' ')}
+      {statusString.replace(/_/g, ' ')}
     </Badge>
   );
 }
