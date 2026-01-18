@@ -5,7 +5,7 @@ Provides intelligent resource allocation, conflict detection, utilization analys
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, or_
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from decimal import Decimal
 from datetime import datetime, timedelta
 from app.models.resource import Resource, Allocation
