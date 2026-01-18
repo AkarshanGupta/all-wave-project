@@ -95,7 +95,7 @@ async def analyze_project_documentation(
         status_result = await db.execute(
             select(StatusReport)
             .where(StatusReport.project_id == project_id)
-            .order_by(StatusReport.report_date.desc())
+            .order_by(StatusReport.generated_at.desc())
         )
         status_reports = list(status_result.scalars().all())
         
