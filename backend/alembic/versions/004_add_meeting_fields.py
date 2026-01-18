@@ -7,7 +7,6 @@ Create Date: 2026-01-18
 """
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import JSON
 
 # revision identifiers, used by Alembic.
 revision = '004'
@@ -21,8 +20,8 @@ def upgrade():
     op.add_column('meetings', sa.Column('date', sa.Date(), nullable=True))
     op.add_column('meetings', sa.Column('time', sa.String(10), nullable=True))
     op.add_column('meetings', sa.Column('duration', sa.Integer(), nullable=True))
-    op.add_column('meetings', sa.Column('attendees', JSON, nullable=True))
-    op.add_column('meetings', sa.Column('status', sa.String(50), nullable=False, server_default='scheduled'))
+    op.add_column('meetings', sa.Column('attendees', sa.Text(), nullable=True))  # Store as JSON string
+    op.add_column('meetings', sa.Column('status', sa.String(50), nullable=True, server_default='scheduled'))
 
 
 def downgrade():

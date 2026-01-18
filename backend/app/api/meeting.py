@@ -31,6 +31,8 @@ async def create_meeting(
     """Create a new meeting."""
     # First, verify the project exists
     from app.models.project import Project
+    from datetime import datetime
+    
     result = await db.execute(select(Project).where(Project.id == meeting_data.project_id))
     project = result.scalar_one_or_none()
     
@@ -40,12 +42,20 @@ async def create_meeting(
             detail=f"Project with id {meeting_data.project_id} not found. Please create the project first."
         )
     
+    # Convert date string to date object if provided
+    date_obj = None
+    if meeting_data.date:
+        try:
+            date_obj = datetime.strptime(meeting_data.date, "%Y-%m-%d").date()
+        except:
+            pass
+    
     meeting = Meeting(
         project_id=meeting_data.project_id,
         title=meeting_data.title,
         raw_text=meeting_data.raw_text,
         summary=meeting_data.summary,
-        date=meeting_data.date,
+        date=date_obj,
         time=meeting_data.time,
         duration=meeting_data.duration,
         attendees=meeting_data.attendees,
@@ -84,6 +94,8 @@ async def update_meeting(
     db: AsyncSession = Depends(get_db)
 ):
     """Update a meeting."""
+    from datetime import datetime
+    
     result = await db.execute(select(Meeting).where(Meeting.id == meeting_id))
     meeting = result.scalar_one_or_none()
     
@@ -95,7 +107,10 @@ async def update_meeting(
     if meeting_data.summary is not None:
         meeting.summary = meeting_data.summary
     if meeting_data.date is not None:
-        meeting.date = meeting_data.date
+        try:
+            meeting.date = datetime.strptime(meeting_data.date, "%Y-%m-%d").date()
+        except:
+            meeting.date = None
     if meeting_data.time is not None:
         meeting.time = meeting_data.time
     if meeting_data.duration is not None:

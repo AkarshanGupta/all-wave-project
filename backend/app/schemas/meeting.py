@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from datetime import datetime
+from pydantic import BaseModel, field_serializer
+from datetime import datetime, date
 from typing import Optional, List
 
 
@@ -70,5 +70,14 @@ class MeetingResponse(BaseModel):
 
     class Config:
         from_attributes = True
+    
+    @field_serializer('date')
+    def serialize_date(self, value: Optional[date], _info) -> Optional[str]:
+        """Serialize date to string format."""
+        if value:
+            if isinstance(value, date):
+                return value.strftime("%Y-%m-%d")
+            return str(value)
+        return None
 
 

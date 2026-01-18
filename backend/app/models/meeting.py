@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Date, Time, JSON
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
+import json
 
 
 class Meeting(Base):
@@ -17,13 +18,31 @@ class Meeting(Base):
     date = Column(Date, nullable=True)
     time = Column(String(10), nullable=True)  # Store as "HH:MM" format
     duration = Column(Integer, nullable=True)  # Duration in minutes
-    attendees = Column(JSON, nullable=True)  # List of attendee names
+    _attendees = Column("attendees", Text, nullable=True)  # Store as JSON string
     status = Column(String(50), default="scheduled")  # scheduled, completed, cancelled
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     project = relationship("Project", back_populates="meetings")
     action_items = relationship("ActionItem", back_populates="meeting", cascade="all, delete-orphan")
+
+    @property
+    def attendees(self):
+        """Get attendees as list."""
+        if self._attendees:
+            try:
+                return json.loads(self._attendees)
+            except:
+                return []
+        return []
+    
+    @attendees.setter
+    def attendees(self, value):
+        """Set attendees from list."""
+        if value is not None:
+            self._attendees = json.dumps(value)
+        else:
+            self._attendees = None
 
 
 class ActionItem(Base):
